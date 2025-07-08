@@ -5,37 +5,39 @@ import Title from '../components/Title';
 import ProductItem from '../components/ProductItem';
 
 const Collection = () => {
-  const { products,search,showSearch } = useContext(ShopContext);
+  const { products, search, showSearch } = useContext(ShopContext);
   const [showFilter, setShowFilter] = useState(false);
   const [filterProducts, setFilterProducts] = useState([]);
   const [category, setCategory] = useState([]);
   const [subCategory, setSubCategory] = useState([]);
   const [sortType, setSortType] = useState('relevant');
-  
 
-
+  // Toggle category checkbox
   const toggleCategory = (e) => {
-    if (category.includes(e.target.value)) {
-      setCategory((prev) => prev.filter((item) => item !== e.target.value));
-    } else {
-      setCategory((prev) => [...prev, e.target.value]);
-    }
+    const value = e.target.value;
+    setCategory((prev) =>
+      prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]
+    );
   };
 
+  // Toggle subcategory checkbox
   const toggleSubCategory = (e) => {
-    if (subCategory.includes(e.target.value)) {
-      setSubCategory((prev) => prev.filter((item) => item !== e.target.value));
-    } else {
-      setSubCategory((prev) => [...prev, e.target.value]);
-    }
+    const value = e.target.value.toLowerCase(); // Ensure lowercase for matching
+    setSubCategory((prev) =>
+      prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]
+    );
   };
 
+  // Apply filters (search, category, subcategory)
   const applyFilter = () => {
     let productsCopy = products.slice();
-    if(showSearch && search)
-    {
-      productsCopy=productsCopy.filter(item=>item.name.toLowerCase().includes(search.toLowerCase()))
+
+    if (showSearch && search) {
+      productsCopy = productsCopy.filter((item) =>
+        item.name.toLowerCase().includes(search.toLowerCase())
+      );
     }
+
     if (category.length > 0) {
       productsCopy = productsCopy.filter((item) =>
         category.includes(item.category)
@@ -44,15 +46,18 @@ const Collection = () => {
 
     if (subCategory.length > 0) {
       productsCopy = productsCopy.filter((item) =>
-        subCategory.includes(item.subcategory)
+        subCategory.includes(item.subCategory?.toLowerCase())
       );
     }
 
+    console.log("Filtered Products:", productsCopy);
     setFilterProducts(productsCopy);
   };
 
+  // Sort filtered products
   const sortProduct = () => {
     let sortedCopy = filterProducts.slice();
+
     switch (sortType) {
       case 'low-high':
         sortedCopy.sort((a, b) => a.price - b.price);
@@ -61,9 +66,10 @@ const Collection = () => {
         sortedCopy.sort((a, b) => b.price - a.price);
         break;
       default:
-        applyFilter(); // fallback to filtered list
+        applyFilter(); // If "relevant", just re-apply filters
         return;
     }
+
     setFilterProducts(sortedCopy);
   };
 
@@ -74,8 +80,10 @@ const Collection = () => {
   }, [products]);
 
   useEffect(() => {
+    console.log("Selected Categories:", category);
+    console.log("Selected SubCategories:", subCategory);
     applyFilter();
-  }, [category, subCategory,search,showSearch]);
+  }, [category, subCategory, search, showSearch]);
 
   useEffect(() => {
     sortProduct();
@@ -93,7 +101,7 @@ const Collection = () => {
           <img
             src={assets.dropdown_icon}
             className={`h-3 sm:hidden ${showFilter ? 'rotate-90' : ''}`}
-            alt=""
+            alt="dropdown"
           />
         </p>
 
@@ -131,7 +139,7 @@ const Collection = () => {
             <label className="flex gap-2">
               <input
                 type="checkbox"
-                value="Top wear"
+                value="Topwear"
                 className="w-3"
                 onChange={toggleSubCategory}
               />
@@ -140,7 +148,7 @@ const Collection = () => {
             <label className="flex gap-2">
               <input
                 type="checkbox"
-                value="Bottom wear"
+                value="Bottomwear"
                 className="w-3"
                 onChange={toggleSubCategory}
               />
@@ -149,7 +157,7 @@ const Collection = () => {
             <label className="flex gap-2">
               <input
                 type="checkbox"
-                value="Winter wear"
+                value="Winterwear"
                 className="w-3"
                 onChange={toggleSubCategory}
               />
